@@ -38,6 +38,13 @@ function explorer {
 function settings {
     start-process ms-setttings:
 }
+function md5 { Get-FileHash -Algorithm MD5 $args }
+function sha1 { Get-FileHash -Algorithm SHA1 $args }
+function sha256 { Get-FileHash -Algorithm SHA256 $args }
+
+function HKLM: { Set-Location HKLM: }
+function HKCU: { Set-Location HKCU: }
+function Env: { Set-Location Env: }
 
 function rename-extension($newExtension) {
     Rename-Item -NewName { [System.IO.Path]::ChangeExtension($_.Name, $newExtension) }
@@ -46,14 +53,18 @@ function edit {
     & "code" -g @args
 }
 
+# Aliases
+set-alias unzip expand-archive
+Set-Alias trash Remove-ItemSafely
+
 # Modules
 
+# Git integration like tab completion
+Import-Module posh-git
+
 # Proper history etc
-Import-Module PSReadLine 
-if ( -Not (Get-Module -ListAvailable -Name Pscx)) {
-Install-Module Pscx -Scope CurrentUser -AllowClobber # https://github.com/Pscx/Pscx
-    
-}
+#Import-Module PSReadLine
+#Import-Module -Name Terminal-Icons
 
 # CONFIGS
 # Produce UTF-8 by default
@@ -68,7 +79,7 @@ $MaximumHistoryCount = 10000;
 $env:DOCUMENTS = [Environment]::GetFolderPath("mydocuments")
 
 
-foreach ( $includeFile in ("aliases", "git", "openssl", "nodejs", "unix") ) {
+foreach ( $includeFile in ( "openssl", "unix") ) {
     Unblock-File $profileDir\$includeFile.ps1
     . "$profileDir\$includeFile.ps1"
 }

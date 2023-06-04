@@ -1,19 +1,10 @@
 
-# Just a couple of things (sed, to interpret sed scripts) from http://unxutils.sourceforge.net/
-Add-PathVariable "${env:ProgramFiles}\UnxUtils"
-
-# Note PSReadLine uses vi keybindings by default. If you want emacs enable:
-# Set-PSReadlineOption -EditMode Emacs
-# I like vi keybindings, so I just add my favourite one from emacs
-# See https://github.com/lzybkr/PSReadLine#usage
-Set-PSReadlineKeyHandler -Key 'Escape,_' -Function YankLastArg
-
 # Change how powershell does tab completion
 # http://stackoverflow.com/questions/39221953/can-i-make-powershell-tab-complete-show-me-all-options-rather-than-picking-a-sp
 Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
 
 # For dig, host, etc.
-Add-PathVariable "${env:ProgramFiles}\ISC BIND 9\bin"
+#Add-PathVariable "${env:ProgramFiles}\ISC BIND 9\bin"
 
 # Should really be name=value like Unix version of export but not a big deal
 function export($name, $value) {
@@ -28,16 +19,7 @@ function pgrep($name) {
 	get-process $name
 }
 
-# Like Unix touch, creates new files and updates time on old ones
-# PSCX has a touch, but it doesn't make empty files
-Remove-Alias touch
-function touch($file) {
-	if ( Test-Path $file ) {
-		Set-FileTime $file
-	} else {
-		New-Item $file -type file
-	}
-}
+
 
 # From https://stackoverflow.com/questions/894430/creating-hard-and-soft-links-using-powershell
 function ln($target, $link) {
@@ -47,7 +29,7 @@ function ln($target, $link) {
 set-alias new-link ln
 
 # http://stackoverflow.com/questions/39148304/fuser-equivalent-in-powershell/39148540#39148540
-function fuser($relativeFile){
+function fuser($relativeFile) {
 	$file = Resolve-Path $relativeFile
 	write-output "Looking for processes using $file"
 	foreach ( $Process in (Get-Process)) {
@@ -60,13 +42,9 @@ function fuser($relativeFile){
 }
 
 # https://gallery.technet.microsoft.com/WHOIS-PowerShell-Function-ed69fde6
-Unblock-File $PSScriptRoot\whois.ps1
-. $PSScriptRoot\whois.ps1
+#Unblock-File $PSScriptRoot\whois.ps1
+#. $PSScriptRoot\whois.ps1
 
-function uptime {
-	Get-CimInstance Win32_OperatingSystem | select-object csname, @{LABEL='LastBootUpTime';
-	EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}}
-}
 
 function df {
 	get-volume
@@ -74,9 +52,9 @@ function df {
 
 # Todo: look at 'edit-file' from PSCX
 # Repalced with real 'sed' to interpret sed scripts
-# function sed($file, $find, $replace){
-# 	(Get-Content $file).replace("$find", $replace) | Set-Content $file
-# }
+function sed($file, $find, $replace){
+	(Get-Content $file).replace("$find", $replace) | Set-Content $file
+}
 
 # Like a recursive sed
 function edit-recursive($filePattern, $find, $replace) {
@@ -100,31 +78,25 @@ function grepv($regex) {
 	$input | where-object { !$_.Contains($regex) }
 }
 
-function show-links($dir){
-	get-childitem $dir | where-object {$_.LinkType} | select-object FullName,LinkType,Target
+function show-links($dir) {
+	get-childitem $dir | where-object { $_.LinkType } | select-object FullName, LinkType, Target
 }
 
 function which($name) {
 	Get-Command $name | Select-Object -ExpandProperty Definition
 }
 
-function cut(){
-	foreach ($part in $input) {
-		$line = $part.ToString();
-		$MaxLength = [System.Math]::Min(200, $line.Length)
-		$line.subString(0, $MaxLength)
-	}
-}
+
 
 function Private:file($file) {
 	$extension = (Get-Item $file).Extension
 	$fileType = (get-itemproperty "Registry::HKEY_Classes_root\$extension")."(default)"
-	$description =  (get-itemproperty "Registry::HKEY_Classes_root\$fileType")."(default)"
+	$description = (get-itemproperty "Registry::HKEY_Classes_root\$fileType")."(default)"
 	write-output $description
 }
 
 # From https://github.com/Pscx/Pscx
-function sudo(){
+function sudo() {
 	Invoke-Elevated @args
 }
 
@@ -158,7 +130,8 @@ function pstree {
 		$Indent = " " * $IndentLevel
 		if ($Process.CommandLine) {
 			$Description = $Process.CommandLine
-		} else {
+		}
+		else {
 			$Description = $Process.Caption
 		}
 

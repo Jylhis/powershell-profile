@@ -12,7 +12,8 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
                 New-Item -Path ($env:userprofile + "\Documents\WindowsPowerShell") -ItemType "directory"
             }
         }
-
+        
+        # TODO: Change
         Invoke-RestMethod https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created."
     }
@@ -22,6 +23,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 }
 # If the file already exists, show the message and do nothing.
 else {
+    # TODO: Change
     Get-Item -Path $PROFILE | Move-Item -Destination oldprofile.ps1
     Invoke-RestMethod https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1 -o $PROFILE
     Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
@@ -30,18 +32,20 @@ else {
 
 # OMP Install
 #
-winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
+#winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
+
 
 # Font Install
 # You will have to extract and Install this font manually, alternatively use the oh my posh font installer (Must be run as admin)
 # oh-my-posh font install
 # You will also need to set your Nerd Font of choice in your window defaults or in the Windows Terminal Settings.
-Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/CascadiaCode.zip?WT.mc_id=-blog-scottha -o cove.zip
+#Invoke-RestMethod https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/CascadiaCode.zip?WT.mc_id=-blog-scottha -o cove.zip
 
 # Choco install
 #
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-# Terminal Icons Install
-#
-Install-Module -Name Terminal-Icons -Repository PSGallery
+
+Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser
+Install-Module Pscx -Scope CurrentUser # https://github.com/Pscx/Pscx
+Install-Module posh-git -Scope CurrentUser
